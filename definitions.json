@@ -1,0 +1,17 @@
+[
+  {
+    "name": "tech.itpark.di.Controller",
+    "dependencies": ["tech.itpark.di.Service"],
+    "parameters": []
+  },
+  {
+    "name": "tech.itpark.di.Service",
+    "dependencies": ["tech.itpark.di.Repository"],
+    "parameters": ["SRVC-VALUE"]
+  },
+  {
+    "name": "tech.itpark.di.Repository",
+    "dependencies": [],
+    "parameters": [111, "REPO-VALUE", true]
+  }
+]

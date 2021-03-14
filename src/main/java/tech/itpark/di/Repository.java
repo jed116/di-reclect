@@ -2,7 +2,7 @@ package tech.itpark.di;
 
 import tech.itpark.di.intefaces.ParamStringInterface;
 
-public class Repository implements ParamStringInterface {
+public class Repository {
     private String  paramString = "empty";
     private int     paramInt = 0;
     private boolean paramBool = false;
@@ -32,7 +32,7 @@ public class Repository implements ParamStringInterface {
         this.paramBool = paramBool;
     }
 
-    @Override
+//    @Override
     public String getParamString() throws NoSuchFieldException, IllegalAccessException {
         return paramString;
     }

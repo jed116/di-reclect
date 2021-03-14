@@ -15,7 +15,7 @@ public class Main {
         Definition[] definitions = reader.read(Paths.get("definitions.json"));
 
         container.register(definitions);
-        container.wire(3);
+        container.wire();
 
 
         Controller objController = (Controller) container.getObjectByName(Controller.class.getName());

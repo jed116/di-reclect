@@ -37,7 +37,7 @@ public class Container {
         return null;
     }
 
-    private Constructor<?> findConstructor(Definition definition, Map<String, Object> objects,
+    private Optional<Constructor<?>> findConstructor(Definition definition, Map<String, Object> objects,
                                            List<Object> constructorParameters) throws ClassNotFoundException {
 
         final Class<?> cls = Class.forName(definition.getName());
@@ -80,7 +80,7 @@ public class Container {
                 }
             }
         }
-        return result;
+        return Optional.ofNullable(result);
     }
 
 
@@ -90,48 +90,51 @@ public class Container {
     }
 
     // связывание зависимостей (создаём из определений объекты)
-    public void wire(int levels) {
+    public void wire() {
         try {
             List<Definition> lostDefinitions = new LinkedList<>(definitions);
 
-            while (lostDefinitions.size() > 0 && levels > 0) {
+            int lostSize = lostDefinitions.size();
+            var iterator = lostDefinitions.iterator();
+            while (iterator.hasNext()) {
+                final var definition = iterator.next();
 
-                final var iterator = lostDefinitions.iterator();
-                while (iterator.hasNext()) {
-                    final var definition = iterator.next();
-                    // Пропуск если у очередной definition не достает нужных objects'ов
-                    if (!objectMap.keySet().containsAll(Arrays.asList(definition.getDependencies()))) {
-                        continue;
+                if (!objectMap.keySet().containsAll(Arrays.asList(definition.getDependencies()))) {continue;}
+
+                List<Object> foundConstructorParameters = new LinkedList<>();
+                Optional<Constructor<?>> foundConstructor = findConstructor(definition, objectMap, foundConstructorParameters);
+                if (foundConstructor.isEmpty()) {
+                    throw new AmbiguousConstructorException("Сouldn't find the required constructor for definition " +
+                            definition.getName());
+                }
+                final Object obj = foundConstructor.get().newInstance(foundConstructorParameters.toArray());
+                objectMap.put(obj.getClass().getName(), obj);
+
+                // interfaces
+                for (Class<?> iface : Class.forName(definition.getName()).getInterfaces()) {
+                    String ifaceName = iface.getName();
+                    if (objectMap.containsKey(ifaceName)) {
+                        throw new AmbiguousConstructorException("To many implements for interface " + ifaceName);
                     }
-
-                    List<Object> foundConstructorParameters = new LinkedList<>();
-                    Constructor<?> foundConstructor = findConstructor(definition, objectMap, foundConstructorParameters);
-                    if (foundConstructor == null) {
-                        throw new AmbiguousConstructorException("Сouldn't find the required constructor for definition " +
-                                definition.getName());
-                    }
-                    final Object obj = foundConstructor.newInstance(foundConstructorParameters.toArray());
-                    objectMap.put(obj.getClass().getName(), obj);
-
-                    // interfaces
-                    for (Class<?> iface : Class.forName(definition.getName()).getInterfaces()) {
-                        objectMap.put(iface.getName(), obj);
-                    }
-
-                    iterator.remove();
+                    objectMap.put(ifaceName, obj);
                 }
 
-                levels--;
+                iterator.remove();
+
+                if (!iterator.hasNext() && lostSize != lostDefinitions.size()) {
+                    lostSize = lostDefinitions.size();
+                    iterator = lostDefinitions.iterator();
+                }
             }
 
-            if (objectMap.size() == definitions.size()) {
+            if (objectMap.size() == definitions.size()){
                 return;
             }
 
             if (lostDefinitions.size() != 0) {
                 StringBuilder builder = new StringBuilder();
-                lostDefinitions.forEach(x -> builder.append("\n- "+x.getName()));
-                throw new UnmetDependencyException( "Unmet dependency for :" + builder.toString() + "\nNot found all dependencies!!!");
+                lostDefinitions.forEach(x -> builder.append("\n- " + x.getName()));
+                throw new UnmetDependencyException("Unmet dependency for :" + builder.toString() + "\nNot found all dependencies!!!");
             }
 
         } catch (Exception e) {

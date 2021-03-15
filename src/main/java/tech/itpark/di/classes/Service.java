@@ -1,8 +1,8 @@
-package tech.itpark.di;
+package tech.itpark.di.classes;
 
-import tech.itpark.di.intefaces.ParamStringInterface;
+import tech.itpark.di.intefaces.ServiceParamStringInterface;
 
-public class Service{
+public class Service implements ServiceParamStringInterface {
     private final Repository repo;
     private String paramString = "empty";
 
@@ -15,8 +15,4 @@ public class Service{
         this.paramString = paramString;
     }
 
-//    @Override
-    public String getParamString() throws NoSuchFieldException, IllegalAccessException {
-        return paramString;
-    }
 }

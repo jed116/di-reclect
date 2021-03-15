@@ -1,8 +1,8 @@
-package tech.itpark.di;
+package tech.itpark.di.classes;
 
-import tech.itpark.di.intefaces.ParamStringInterface;
+import tech.itpark.di.intefaces.RepositoryParamStringInterface;
 
-public class Repository {
+public class Repository implements RepositoryParamStringInterface {
     private String  paramString = "empty";
     private int     paramInt = 0;
     private boolean paramBool = false;
@@ -32,8 +32,8 @@ public class Repository {
         this.paramBool = paramBool;
     }
 
-//    @Override
-    public String getParamString() throws NoSuchFieldException, IllegalAccessException {
+    @Override
+    public String getParamString(){
         return paramString;
     }
 }

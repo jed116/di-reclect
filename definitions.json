@@ -1,16 +1,16 @@
 [
   {
-    "name": "tech.itpark.di.Controller",
-    "dependencies": ["tech.itpark.di.Service"],
+    "name": "tech.itpark.di.classes.Controller",
+    "dependencies": ["tech.itpark.di.classes.Service"],
     "parameters": []
   },
   {
-    "name": "tech.itpark.di.Service",
-    "dependencies": ["tech.itpark.di.Repository"],
+    "name": "tech.itpark.di.classes.Service",
+    "dependencies": ["tech.itpark.di.classes.Repository"],
     "parameters": ["SRVC-VALUE"]
   },
   {
-    "name": "tech.itpark.di.Repository",
+    "name": "tech.itpark.di.classes.Repository",
     "dependencies": [],
     "parameters": [111, "REPO-VALUE", true]
   }
